@@ -14,6 +14,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - **npm** is the package manager (`package-lock.json`; don't use yarn/pnpm/bun).
 - Layout: everything lives under `src/` — routes in `src/app/` (entrypoints `layout.tsx`, `page.tsx`), components in `src/components/`, helpers in `src/lib/`. Path alias `@/*` → `./src/*`.
 - Homepage: `layout.tsx` mounts `NavBar` + `Footer`; `page.tsx` composes `src/components/home/*`. `HeroSection.tsx`, `WhyChooseUs.tsx`, `TestimonialsSection.tsx`, `SectionCTA.tsx` are **unused duplicates kept intentionally** (user decision) — don't wire them up or delete them. Known lint noise: a warning in `TestimonialsSection.tsx`, a targeted eslint-disable in `ui/carousel.tsx`.
+- Backend: sibling repo `../wanderlust_server` (Express on `:5000`, MongoDB db `wanderlast`, collection `data`) — client pages fetch it directly; `/destinations` needs it running. No DELETE endpoint; clean up test rows with the `mongodb` driver + that repo's `.env`.
+- `src/middleware.ts` protects everything except `/`, `/login`, `/signup` with a cookie **existence** check (`better-auth.session_token`). To curl-test protected pages locally: `-H "Cookie: better-auth.session_token=x"`.
 
 ## Commands
 

@@ -11,8 +11,9 @@ import { authClient } from "@/lib/auth-client";
 const links = [
     { href: "/", label: "Home" },
     { href: "/destinations", label: "Destinations" },
+    { href: "/add-destination", label: "Add-Destination" },
     { href: "/my-bookings", label: "My Bookings" },
-    { href: "/admin", label: "Admin" },
+
 ];
 
 export default function Navbar(): React.JSX.Element {
