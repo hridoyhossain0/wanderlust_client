@@ -21,6 +21,8 @@ export default function RegisterPage(): React.JSX.Element {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+   
+
 
         setErrorMsg("");
 

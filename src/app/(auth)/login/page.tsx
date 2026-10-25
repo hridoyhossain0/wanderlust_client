@@ -1,15 +1,18 @@
+
 "use client";
 
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Mail, Lock } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
-import { FaGithub } from "react-icons/fa";
 import { authClient } from "@/lib/auth-client";
 
-export default function LoginPage(): React.JSX.Element {
+function LoginForm(): React.JSX.Element {
     const router = useRouter();
+    const searchParams = useSearchParams();
+
+    const callbackUrl = searchParams.get("callbackUrl") || "/";
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -20,7 +23,9 @@ export default function LoginPage(): React.JSX.Element {
     >(null);
     const [errorMsg, setErrorMsg] = useState("");
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (
+        e: React.FormEvent<HTMLFormElement>
+    ) => {
         e.preventDefault();
 
         setLoading(true);
@@ -30,22 +35,26 @@ export default function LoginPage(): React.JSX.Element {
             const { data, error } = await authClient.signIn.email({
                 email,
                 password,
-                callbackURL: "/",
+                callbackURL: callbackUrl,
                 rememberMe,
             });
 
             if (error) {
-                setErrorMsg(error.message || "সাইন ইন করতে ব্যর্থ হয়েছে।");
+                setErrorMsg(
+                    error.message || "সাইন ইন করতে ব্যর্থ হয়েছে।"
+                );
                 return;
             }
 
             if (data) {
-                router.replace("/");
+                router.replace(callbackUrl);
                 router.refresh();
             }
         } catch (error) {
             console.error("Sign-in error:", error);
-            setErrorMsg("সার্ভারে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।");
+            setErrorMsg(
+                "সার্ভারে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।"
+            );
         } finally {
             setLoading(false);
         }
@@ -60,18 +69,21 @@ export default function LoginPage(): React.JSX.Element {
         try {
             const { error } = await authClient.signIn.social({
                 provider,
-                callbackURL: "/",
+                callbackURL: callbackUrl,
             });
 
             if (error) {
                 setErrorMsg(
-                    error.message || "সোশ্যাল সাইন ইন করতে ব্যর্থ হয়েছে।"
+                    error.message ||
+                    "সোশ্যাল সাইন ইন করতে ব্যর্থ হয়েছে।"
                 );
                 setSocialLoading(null);
             }
         } catch (error) {
-            console.error(`${provider} sign -in error: `, error);
-            setErrorMsg("সার্ভারে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+            console.error(`${provider} sign-in error:`, error);
+            setErrorMsg(
+                "সার্ভারে সমস্যা হয়েছে। আবার চেষ্টা করুন।"
+            );
             setSocialLoading(null);
         }
     };
@@ -120,7 +132,9 @@ export default function LoginPage(): React.JSX.Element {
                                 type="email"
                                 autoComplete="email"
                                 value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                onChange={(e) =>
+                                    setEmail(e.target.value)
+                                }
                                 placeholder="Enter your email"
                                 className="w-full bg-[#fcfcfc] border border-gray-200 text-gray-800 placeholder-gray-400 text-sm py-3 pl-11 pr-4 focus:outline-none focus:border-cyan-500 focus:bg-white transition-all duration-200"
                                 required
@@ -147,7 +161,9 @@ export default function LoginPage(): React.JSX.Element {
                                 type="password"
                                 autoComplete="current-password"
                                 value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                onChange={(e) =>
+                                    setPassword(e.target.value)
+                                }
                                 placeholder="Enter your password"
                                 className="w-full bg-[#fcfcfc] border border-gray-200 text-gray-800 placeholder-gray-400 text-sm py-3 pl-11 pr-4 focus:outline-none focus:border-cyan-500 focus:bg-white transition-all duration-200"
                                 required
@@ -162,7 +178,9 @@ export default function LoginPage(): React.JSX.Element {
                             <input
                                 type="checkbox"
                                 checked={rememberMe}
-                                onChange={(e) => setRememberMe(e.target.checked)}
+                                onChange={(e) =>
+                                    setRememberMe(e.target.checked)
+                                }
                                 className="size-3.5 accent-cyan-600 rounded border-gray-300"
                                 disabled={loading}
                             />
@@ -215,22 +233,6 @@ export default function LoginPage(): React.JSX.Element {
                     </span>
                 </button>
 
-                {/* GitHub Authentication */}
-                <button
-                    type="button"
-                    onClick={() => handleSocialSignIn("github")}
-                    disabled={loading || socialLoading !== null}
-                    className="w-full mt-3 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium text-xs tracking-wide py-3 flex items-center justify-center gap-2 transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                    <FaGithub className="size-4" />
-
-                    <span>
-                        {socialLoading === "github"
-                            ? "Connecting to GitHub..."
-                            : "Continue with GitHub"}
-                    </span>
-                </button>
-
                 {/* Sign Up Link */}
                 <div className="text-center mt-6 text-xs text-gray-500">
                     Don&apos;t have an account?{" "}
@@ -251,5 +253,21 @@ export default function LoginPage(): React.JSX.Element {
                 ← Back to Home
             </Link>
         </div>
+    );
+}
+
+export default function LoginPage(): React.JSX.Element {
+    return (
+        <Suspense
+            fallback={
+                <div className="min-h-screen w-full bg-gray-50/50 flex items-center justify-center">
+                    <p className="text-sm text-gray-500">
+                        Loading login page...
+                    </p>
+                </div>
+            }
+        >
+            <LoginForm />
+        </Suspense>
     );
 }
