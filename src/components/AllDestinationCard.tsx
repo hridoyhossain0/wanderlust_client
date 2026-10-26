@@ -1,8 +1,9 @@
 import React from 'react';
 import { ArrowUpRight, Calendar, MapPin, Star } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
-interface Destination {
+export interface Destination {
   _id: string;
   destinationName: string;
   country: string;
@@ -66,13 +67,13 @@ const AllDestinationCard = ({ destination }: DestinationCardProps) => {
 
                 {/* Action interactive layout link button anchor */}
                 <div className="mt-auto">
-                    <a
-                        href={`/book/${destination._id}`}
+                    <Link
+                        href={`/destinations/${destination._id}`}
                         className="inline-flex items-center gap-1 text-xs font-semibold tracking-wider text-cyan-500 hover:text-cyan-600 uppercase border-b border-cyan-500 hover:border-cyan-600 pb-0.5 transition-colors"
                     >
                         Book Now
                         <ArrowUpRight className="w-3.5 h-3.5" />
-                    </a>
+                    </Link>
                 </div>
 
             </div>
